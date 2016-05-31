@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<title>User Details</title>
+</head>
+
+<body>
+{% autoescape on %}
+<h1>User Details</h1>
+<table width="80%" class="table-bordered">
+  <tr>
+    <th class="text-right" scope="row">User name:</th>
+    <td>{{ user.name }}</td>
+  </tr>
+  <tr>
+    <th class="text-right" scope="row">Email:</th>
+    <td>{{ user.email }}</td>
+  </tr>
+  <tr>
+    <th class="text-right" scope="row">Joined at:</th>
+    <td>{{ user.reg_time }}</td>
+  </tr>
+  <tr>
+    <th class="text-right" scope="row">Last login at:</th>
+    <td>{{ user.last_login }}</td>
+  </tr>
+  <tr>
+    <th class="text-right" scope="row">This user has logged in</th>
+    <td>{{ user.login_count }} times.</td>
+  </tr>
+</table>
+{% if properties %}
+<h2>Properties of this user</h2>
+<table width="80%" class="table-bordered">
+  <tr>
+    <th scope="col">Name</th>
+    <th scope="col">Size</th>
+    <th scope="col">Price</th>
+    <th scope="col">Creation_date</th>
+  </tr>
+{% for p in properties %}
+  <tr>
+    <td><a href="{{ p.propertydetail }}">{{ p.name }}</a></td>
+    <td>{{ p.size }}</td>
+    <td>{{ p.price }}</td>
+    <td>{{ p.creation_date }}</td>
+  </tr>
+{% endfor %}
+</table>
+{% empty %}
+<h2>This user has not listed properties.</h2>
+{% endif %}
+{% if reviews %}
+<h2>Reviews added by this user</h2>
+<table width="80%" class="table-bordered">
+  <tr>
+    <th scope="col">Property name</th>
+    <th scope="col">Rating</th>
+    <th scope="col">Comment</th>
+    <th scope="col">Review_time</th>
+{% if admin %}
+    <th scope="col">admin</th>
+{% endif %}
+  </tr>
+{% for r in reviews %}
+  <tr>
+    <td><a href="{{ p.propertydetail }}">{{ r.property_name }}</a></td>
+    <td>{{ r.rating }}</td>
+    <td>{{ r.comment }}</td>
+    <td>{{ r.review_time }}</td>
+    {% if admin %}
+    <td>
+      {% if r.hidden %}
+      <a href="#">Hide</a>
+      {% else %}
+      <a href="#">Unhide</a>
+      {% endif %}
+    </td>
+    {% endif %}
+{% endfor %}
+  </tr>
+</table>
+{% empty %}
+<h2>This user has not reviewed any properties.</h2>
+{% endif %}
+{% if admin %}
+<h2>Admin</h2>
+<div class="text-center"><a href="#">Hide this user</a> | <a href="#">Unhide this user</a> | <a href="#">Edit this user </a></div>
+{% endif %}
+{% endautoescape %}
+</body>
+</html>

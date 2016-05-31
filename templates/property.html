@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<title>Property Details</title>
+</head>
+
+<body>
+{% autoescape on %}
+<h1>Property Details</h1>
+<table width="80%" class="table-bordered">
+  <tr>
+    <th class="text-right" scope="row">Property:</th>
+    <td>{{ property.name }}</td>
+  </tr>
+  <tr>
+    <th class="text-right" scope="row">Owned by:</th>
+    <td>{{ property.owner_name }}</td>
+  </tr>
+  <tr>
+    <th class="text-right" scope="row">Added at:</th>
+    <td>{{ property.date_created }}</td>
+  </tr>
+  <tr>
+    <th class="text-right" scope="row">Size:</th>
+    <td>{{ property.size }}</td>
+  </tr>
+  <tr>
+    <th class="text-right" scope="row">Price:</th>
+    <td>${{ property.price }}</td>
+  </tr>
+  <tr>
+    <th class="text-right" scope="row">Average rating:</th>
+    <td>{{ property.avg_rating }}</td>
+  </tr>
+  <tr>
+    <th class="text-right" scope="row">Description:</th>
+    <td>{{ property.description }}</td>
+  </tr>
+</table>
+{% if owner_id != _user_id %}
+  <h2>Create a reservation</h2>
+  <form action="" method="get">
+  <table width="80%">
+    <tr>
+      <th class="text-right"  scope="row"><label for="startdate">Start date:</label></th>
+      <td><input name="startdate" type="text" id="startdate" value="" /></td>
+    </tr>
+    <tr>
+      <th class="text-right"  scope="row"><label for="password">End date:</label></th>
+      <td><input name="enddate" type="text" id="enddate" /></td>
+    </tr>
+    <tr>
+      <th class="text-right"  scope="row">&nbsp;</th>
+      <td><input name="request" type="submit" class="btn-default" id="request" value="Request reservation" /></td>
+    </tr>
+  </table>
+  </form>
+{% endif %}
+{% if admin or owner_id = user_id %}
+  {% if property.hidden %}
+    <a href="#">Unhide property</a>
+  {% else %}
+    <a href="#">Hide property</a>
+  {% endif %}
+  | <a href="{{ edit_link }}">Edit property</a>
+{% endif %}
+{% if reviews %}
+<h2>Reviews</h2>
+<table width="80%" class="table-bordered">
+  <tr>
+    <th scope="col">Reviewer</th>
+    <th scope="col">Rating</th>
+    <th scope="col">Comment</th>
+    <th scope="col">Posted</th>
+    {% if admin %}
+      <th scope="col">Admin</th>
+    {% endif %}
+  </tr>
+{% for r in reviews %}
+  <tr>
+    <td><a href="{{ r.reviewer_link }}">{{ r.reviewer_name }}</a></td>
+    <td>{{ r.rating }}</td>
+    <td>{{ r.comment }}</td>
+    <td>{{ r.review_time }}</td>
+    {% if admin %}
+      <td>
+        {% if r.hidden %}
+          <a href="#">Show</a>
+        {% else %}
+          <a href="#">Hide</a>
+        {% endif %}
+      </td>
+    {% endif %}
+  </tr>
+{% endfor %}
+</table>
+{% empty %}
+<h2>This property has no reviews.</h2>
+{% endif %}
+{% if owner_id != user_id %}
+  <h2>Submit a review.</h2>
+  <form action="" method="get">
+    <table width="80%">
+      <tr>
+        <th class="text-right"  scope="row"><label for="username">Rating</label></th>
+        <td>
+          <ul>
+            <li><input name="rating" type="radio" id="1" /> 1</li>
+            <li><input name="rating" type="radio" id="2" /> 2</li>
+            <li><input name="rating" type="radio" id="3" /> 3</li>
+            <li><input name="rating" type="radio" id="4" /> 4</li>
+            <li><input name="rating" type="radio" id="5" /> 5</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <th class="text-right"  scope="row"><label for="email">Comment</label></th>
+        <td><input name="email" type="text" id="email" /></td>
+      </tr>
+      <tr>
+        <th class="text-right"  scope="row">&nbsp;</th>
+        <td><input name="submit" type="submit" class="btn-default" id="submit" value="Submit review" /></td>
+      </tr>
+    </table>
+  </form>
+{% endif %}
+{% endautoescape %}
+</body>
+</html>
