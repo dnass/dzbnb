@@ -71,6 +71,9 @@ class Review(models.Model):
 	comment = models.TextField(max_length=4096)
 	review_time = models.DateTimeField(auto_now_add=True)
 
+	def clean(self):
+		if rating < 1 or rating > 5:
+			raise ValidationError({'rating': _('Rating must be integer between 1 and 5.')})
 
 class View(models.Model):
 	property = models.ForeignKey(Property, on_delete=models.CASCADE)
