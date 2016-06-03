@@ -71,9 +71,6 @@ class Review(models.Model):
 	comment = models.TextField(max_length=4096)
 	review_time = models.DateTimeField(auto_now_add=True)
 
-	def clean(self):
-		if start_date > end_date:
-			raise ValidationError({'date': _('Start date cannot be later than end date.')})
 
 class View(models.Model):
 	property = models.ForeignKey(Property, on_delete=models.CASCADE)
