@@ -1,0 +1,8 @@
+##############
+## Python+Django Zhengyu added
+##############
+*.sqlite3
+*.pyc
+migrations/
+__pycache__/
+local_settings.py
