@@ -73,7 +73,7 @@ class Review(models.Model):
 
 	def clean(self):
 		if self.rating < 1 or self.rating > 5:
-			raise ValidationError({'rating':_('Rating must be integer between 1 and 5.')})
+			raise ValidationError({'rating': _('Rating must be integer between 1 and 5.')})
 
 class View(models.Model):
 	property = models.ForeignKey(Property, on_delete=models.CASCADE)
