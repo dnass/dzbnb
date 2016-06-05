@@ -60,8 +60,8 @@ class Reservation(models.Model):
 	approved = models.BooleanField(default=False)
 
 	def clean(self):
-		if start_date > end_date:
-			raise ValidationError({'date': _('Start date cannot be later than end date.')})
+		if self.start_date > self.end_date:
+			raise ValidationError(_('Start date cannot be later than end date.'))
 
 class Review(models.Model):
 	reviewer = models.ForeignKey(BNBUser, on_delete=models.CASCADE)
@@ -72,7 +72,7 @@ class Review(models.Model):
 	review_time = models.DateTimeField(auto_now_add=True)
 
 	def clean(self):
-		if rating < 1 or rating > 5:
+		if self.rating < 1 or self.rating > 5:
 			raise ValidationError({'rating': _('Rating must be integer between 1 and 5.')})
 
 class View(models.Model):
