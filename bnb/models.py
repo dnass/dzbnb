@@ -15,8 +15,7 @@ class BNBUser(models.Model):
     login_count = models.IntegerField(default=0)
 
     def __str__(self):
-        u = User.objects.get(id=self.user)
-        return '{}. {}'.format(self.id, u.username)
+        return '{}. {}'.format(self.id, self.user.username)
 
     def clean(self):
         errors = {}
