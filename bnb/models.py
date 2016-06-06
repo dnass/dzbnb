@@ -4,30 +4,16 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
-import datetime
-
 class BNBUser(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    hidden = models.BooleanField(default=False)
-    admin = models.BooleanField(default=False)
-    reg_time = models.DateTimeField(auto_now_add=True)
-    last_login = models.DateTimeField(auto_now_add=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     login_count = models.IntegerField(default=0)
 
-    def __str__(self):
-        return '{}. {}'.format(self.id, self.user.username)
-
     def clean(self):
-        errors = {}
-        if self.last_login < self.reg_time:
-            errors['last_login'] = ValidationError(_('Last login time must be greater than or equal to registration time.'))
         if self.login_count < 0:
-            errors['login_count'] = ValidationError(_('Login count must be greater than or equal to 0.'))
-        if errors:
-            raise ValidationError(errors)
+            raise ValidationError({'login_count': _('Login count must be greater than or equal to 0.')})
 
 class Property(models.Model):
-    owner = models.ForeignKey(BNBUser, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
     hidden = models.BooleanField(default=False)
     creation_date = models.DateTimeField(auto_now_add=True)
@@ -53,7 +39,7 @@ class Property(models.Model):
 
 class Reservation(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE)
-    renter = models.ForeignKey(BNBUser, on_delete=models.CASCADE)
+    renter = models.ForeignKey(User, on_delete=models.CASCADE)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     approved = models.BooleanField(default=False)
@@ -63,7 +49,7 @@ class Reservation(models.Model):
             raise ValidationError(_('Start date cannot be later than end date.'))
 
 class Review(models.Model):
-    reviewer = models.ForeignKey(BNBUser, on_delete=models.CASCADE)
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
     property = models.ForeignKey(Property, on_delete=models.CASCADE)
     hidden = models.BooleanField(default=False)
     rating = models.IntegerField()
@@ -76,5 +62,5 @@ class Review(models.Model):
 
 class View(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE)
-    viewer = models.ForeignKey(BNBUser, on_delete=models.CASCADE)
+    viewer = models.ForeignKey(User, on_delete=models.CASCADE)
     view_time = models.DateTimeField(auto_now_add=True) #https://docs.djangoproject.com/en/1.9/ref/models/fields/#django.db.models.DateTimeField
