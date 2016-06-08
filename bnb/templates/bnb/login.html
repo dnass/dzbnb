@@ -1,5 +1,5 @@
-{% extends "base.html" %}
-{% block title %}Edit Property{% endblock %}
+{% extends "bnb/base.html" %}
+{% block title %}Login{% endblock %}
 {% block content %}
 <h1>Login</h1>
 <form action="" method="post">
@@ -13,7 +13,7 @@
     <td><input type="text" name="password" id="password" /></td>
   </tr>
   <tr>
-    <th class="text-right"  scope="row">&nbsp;</th>
+    <th class="text-right"  scope="row"><input type="hidden" name="return_page" value="{{ return_page }}"></th>
     <td><input name="login" type="submit" class="btn-default" id="login" value="Login" /></td>
   </tr>
 </table>
