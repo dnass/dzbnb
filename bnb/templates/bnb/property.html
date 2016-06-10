@@ -5,7 +5,7 @@
 <table width="80%" class="table-bordered">
   <tr>
     <th class="text-right" scope="row">Property:</th>
-    <td>{{ p.name }}</td>
+    <td>{{ p }}</td>
   </tr>
   <tr>
     <th class="text-right" scope="row">Owned by:</th>
@@ -17,15 +17,15 @@
   </tr>
   <tr>
     <th class="text-right" scope="row">Size:</th>
-    <td>{{ p.size }}</td>
+    <td>{{ p.size|floatformat:1 }}</td>
   </tr>
   <tr>
     <th class="text-right" scope="row">Price:</th>
-    <td>${{ p.price }}</td>
+    <td>${{ p.price|floatformat:2 }}</td>
   </tr>
   <tr>
     <th class="text-right" scope="row">Average rating:</th>
-    <td>{{ p.average_rating }} ({{ p.rating_count }} ratings)</td>
+    <td>{{ p.average_rating|floatformat:1 }} ({{ p.rating_count }} rating{{ p.rating_count|pluralize }})</td>
   </tr>
   <tr>
     <th class="text-right" scope="row">Description:</th>
@@ -38,11 +38,11 @@
     <table width="80%">
       <tr>
         <th class="text-right"  scope="row"><label for="start_date">Start date:</label></th>
-        <td><input name="start_date" type="text" id="start_date" value="" /></td>
+        <td><input name="start_date" type="text" class="datepicker" id="datepicker" value="" /></td>
       </tr>
       <tr>
         <th class="text-right"  scope="row"><label for="end_date">End date:</label></th>
-        <td><input name="end_date" type="text" id="end_date" /></td>
+        <td><input name="end_date" type="text" class="datepicker" id="end_date" /></td>
       </tr>
       <tr>
         <th class="text-right"  scope="row">&nbsp;</th>

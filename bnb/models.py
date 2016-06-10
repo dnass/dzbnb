@@ -3,6 +3,10 @@ from django.conf import settings #To reference the User model, see https://docs.
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
+
+BLACK_STAR = u"\u2605"
+WHITE_STAR = u"\u2606"
 
 class BNBUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -64,6 +68,7 @@ class Reservation(models.Model):
         if self.start_date >= self.end_date:
             raise ValidationError(_('End date must be later than Start Date.'))
 
+@python_2_unicode_compatible
 class Review(models.Model):
     reviewer = models.ForeignKey(BNBUser, on_delete=models.CASCADE)
     propertie = models.ForeignKey(Propertie, on_delete=models.CASCADE)
@@ -73,7 +78,7 @@ class Review(models.Model):
     review_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '{}{} {}'.format('★'*self.rating, '☆'*(5-self.rating), self.propertie.name)
+        return '{}{} {}'.format(BLACK_STAR*self.rating, WHITE_STAR*(5-self.rating), self.propertie.name)
 
     def clean(self):
         if self.rating < 1 or self.rating > 5:
