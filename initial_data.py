@@ -30,7 +30,7 @@ else:
         print ('Creating Users:')
         for i in range(0, TOTAL_USERS_TO_ADD-1): 
             u = User()
-            u.password = UNI_PASSWORD
+            u.password = UNI_PASSWORD # need add hash function
             u.first_name = fake.first_name()
             u.last_name = fake.last_name()
             u.email = fake.email()
@@ -66,14 +66,14 @@ else:
                 print (sys.exc_info()[0])
             else:
                 print ()
-                all_bnbusers = BNBUser.objects.all()
+
                 properties_to_insert = []
                 print ('Creating Properties:')
                 i = 0
-                for b in all_bnbusers:
+                for u in all_users:
                     for _ in range(0, randint(0, MAX_PROPERTIES_PER_USER)):
                         p = Propertie()
-                        p.owner = b
+                        p.owner = u
                         p.name = fake.sentence(nb_words=randint(3, 8), variable_nb_words=True)
                         p.hidden = fake.boolean(chance_of_getting_true=2)
                         p.size = randrange(0, 100)
@@ -89,14 +89,13 @@ else:
                 print ()
  
         all_properties = Propertie.objects.all()
-        all_active_bnbusers = all_bnbusers.filter(user__is_staff=True).filter(user__is_active=True)
         all_active_properties = all_properties.filter(hidden=False)
 
         reservations_to_insert = []
         print ('Creating Reservations:')
         i = 0
-        for u in all_active_bnbusers:
-            if fake.boolean(chance_of_getting_true=50):
+        for u in all_users:
+            if fake.boolean(chance_of_getting_true=99):
                 r = Reservation()
                 r.propertie = choice(all_active_properties)
                 r.renter = u
@@ -115,7 +114,7 @@ else:
         reviews_to_insert = []
         i = 0
         print ('Creating Reviews:')
-        for u in all_active_bnbusers:
+        for u in all_users:
             for j in range(0, randint(0, 5)):
                 rv = Review()
                 rv.reviewer = u
@@ -135,10 +134,10 @@ else:
 
         views_to_insert = []
         print ('Creating Views:')
-        for i in range (0, len(all_bnbusers)*len(all_properties)):
+        for i in range (0, len(all_users)*len(all_properties)):
             v = View()
             v.propertie = choice(all_properties)
-            v.viewer = choice(all_bnbusers)
+            v.viewer = choice(all_users)
             v.view_time = fake.date_time_between(start_date="-1y", end_date="-1m").replace(tzinfo=timezone(TIMEZONE))
             views_to_insert.append(v)
             print ('\r{}'.format(i+1), end='', flush=True)
