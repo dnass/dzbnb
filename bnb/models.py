@@ -3,14 +3,19 @@ from django.conf import settings #To reference the User model, see https://docs.
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
+
+BLACK_STAR = u"\u2605"
+WHITE_STAR = u"\u2606"
 
 class BNBUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     login_count = models.IntegerField(default=0)
-    # Fields inherited from User (Table: auth_user)
+    # Fields from User (Table: auth_user)
         # username : varchar(30)
         # email : varchar(254)
         # password : varchar(128)
+        # is_staff : bool
         # is_active : bool
         # is_superuser : bool
         # date_joined : datetime
@@ -24,7 +29,7 @@ class BNBUser(models.Model):
             raise ValidationError({'login_count': _('Login count must be greater than or equal to 0.')})
 
 class Propertie(models.Model): # altered spelling to avoid Python's reserved word property.
-    owner = models.ForeignKey(BNBUser, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
     hidden = models.BooleanField(default=False)
     creation_date = models.DateTimeField(auto_now_add=True)
@@ -52,7 +57,7 @@ class Propertie(models.Model): # altered spelling to avoid Python's reserved wor
 
 class Reservation(models.Model):
     propertie = models.ForeignKey(Propertie, on_delete=models.CASCADE)
-    renter = models.ForeignKey(BNBUser, on_delete=models.CASCADE)
+    renter = models.ForeignKey(User, on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
     approved = models.BooleanField(default=False)
@@ -64,8 +69,9 @@ class Reservation(models.Model):
         if self.start_date >= self.end_date:
             raise ValidationError(_('End date must be later than Start Date.'))
 
+@python_2_unicode_compatible
 class Review(models.Model):
-    reviewer = models.ForeignKey(BNBUser, on_delete=models.CASCADE)
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
     propertie = models.ForeignKey(Propertie, on_delete=models.CASCADE)
     hidden = models.BooleanField(default=False)
     rating = models.IntegerField()
@@ -73,7 +79,7 @@ class Review(models.Model):
     review_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '{}{} {}'.format('★'*self.rating, '☆'*(5-self.rating), self.propertie.name)
+        return '{}{} {}'.format(BLACK_STAR*self.rating, WHITE_STAR*(5-self.rating), self.propertie.name)
 
     def clean(self):
         if self.rating < 1 or self.rating > 5:
@@ -82,5 +88,5 @@ class Review(models.Model):
 
 class View(models.Model):
     propertie = models.ForeignKey(Propertie, on_delete=models.CASCADE)
-    viewer = models.ForeignKey(BNBUser, on_delete=models.CASCADE)
+    viewer = models.ForeignKey(User, on_delete=models.CASCADE)
     view_time = models.DateTimeField(auto_now_add=True) #https://docs.djangoproject.com/en/1.9/ref/models/fields/#django.db.models.DateTimeField

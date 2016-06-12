@@ -5,11 +5,11 @@
 <table width="80%" class="table-bordered">
   <tr>
     <th class="text-right" scope="row">Property:</th>
-    <td>{{ p.name }}</td>
+    <td>{{ p }}</td>
   </tr>
   <tr>
     <th class="text-right" scope="row">Owned by:</th>
-    <td>{{ p.owner.user.first_name }} {{ p.owner.user.last_name }}</td>
+    <td>{{ p.owner.first_name }} {{ p.owner.last_name }}</td>
   </tr>
   <tr>
     <th class="text-right" scope="row">Added at:</th>
@@ -17,15 +17,15 @@
   </tr>
   <tr>
     <th class="text-right" scope="row">Size:</th>
-    <td>{{ p.size }}</td>
+    <td>{{ p.size|floatformat:1 }}</td>
   </tr>
   <tr>
     <th class="text-right" scope="row">Price:</th>
-    <td>${{ p.price }}</td>
+    <td>${{ p.price|floatformat:2 }}</td>
   </tr>
   <tr>
     <th class="text-right" scope="row">Average rating:</th>
-    <td>{{ p.average_rating }} ({{ p.rating_count }} ratings)</td>
+    <td>{{ p.average_rating|floatformat:1 }} ({{ p.rating_count }} rating{{ p.rating_count|pluralize }})</td>
   </tr>
   <tr>
     <th class="text-right" scope="row">Description:</th>
@@ -34,15 +34,15 @@
 </table>
 {% if show_reservation_form %}
   <h2>Request a reservation</h2>
-  <form action="{% url 'request_reservation' p.id %}" method="post">
+  <form action="{% url 'request_reservation' p.id %}" method="post">{% csrf_token %}
     <table width="80%">
       <tr>
         <th class="text-right"  scope="row"><label for="start_date">Start date:</label></th>
-        <td><input name="start_date" type="text" id="start_date" value="" /></td>
+        <td><input name="start_date" type="text" class="datepicker" id="datepicker" value="" /></td>
       </tr>
       <tr>
         <th class="text-right"  scope="row"><label for="end_date">End date:</label></th>
-        <td><input name="end_date" type="text" id="end_date" /></td>
+        <td><input name="end_date" type="text" class="datepicker" id="end_date" /></td>
       </tr>
       <tr>
         <th class="text-right"  scope="row">&nbsp;</th>
@@ -73,7 +73,7 @@
   </tr>
 {% for r in reviews %}
   <tr>
-    <td><a href="{% url 'bnbuser_details' r.reviewer.id %}">{{ r.reviewer.user.first_name }} {{ r.reviewer.user.last_name }}</a></td>
+    <td><a href="{% url 'user_details' r.reviewer.id %}">{{ r.reviewer.first_name }} {{ r.reviewer.last_name }}</a></td>
     <td>{{ r.rating }}</td>
     <td>{{ r.comment }}</td>
     <td>{{ r.review_time }}</td>
@@ -92,25 +92,25 @@
 {% else %}
 <h2>This property has no reviews.</h2>
 {% endif %}
-{% if owner_id != user_id %}
+{% if show_submit_review_form %}
   <h2>Submit a review.</h2>
-  <form action="" method="get">
+  <form action="{% url 'review_property' p.id %}" method="post">{% csrf_token %}
     <table width="80%">
       <tr>
-        <th class="text-right"  scope="row"><label for="username">Rating</label></th>
+        <th class="text-right" scope="row"><label for="rating">Rating</label></th>
         <td>
-          <ul>
-            <li><input name="rating" type="radio" id="1" /> 1</li>
-            <li><input name="rating" type="radio" id="2" /> 2</li>
-            <li><input name="rating" type="radio" id="3" /> 3</li>
-            <li><input name="rating" type="radio" id="4" /> 4</li>
-            <li><input name="rating" type="radio" id="5" /> 5</li>
-          </ul>
+          <ol>
+            <li><input name="rating" type="radio" value="1" /></li>
+            <li><input name="rating" type="radio" value="2" /></li>
+            <li><input name="rating" type="radio" value="3" /></li>
+            <li><input name="rating" type="radio" value="4" /></li>
+            <li><input name="rating" type="radio" value="5" /></li>
+          </ol>
         </td>
       </tr>
       <tr>
-        <th class="text-right"  scope="row"><label for="email">Comment</label></th>
-        <td><input name="email" type="text" id="email" /></td>
+        <th class="text-right"  scope="row"><label for="Comment">Comment</label></th>
+        <td><input name="comment" type="text" id="comment" /></td>
       </tr>
       <tr>
         <th class="text-right"  scope="row">&nbsp;</th>

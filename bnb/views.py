@@ -5,14 +5,12 @@ from .models import *
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Avg, Count
 
-
-
 def homepage(request):
     if request.user.is_authenticated():
         recently_added_properties = Propertie.objects.order_by('-creation_date')[:10]
-        reservation_requests = Reservation.objects.filter(propertie__owner__user_id=request.user.id).filter(approved=False).order_by('-start_date')
+        reservation_requests = Reservation.objects.filter(propertie__owner=request.user).filter(approved=False).order_by('-start_date')
         context = {
-            'bnbuser': BNBUser.objects.filter(user__id=request.user.id)[0],
+            'user': request.user,
             'recently_added_properties': recently_added_properties,
             'reservation_requests': reservation_requests,
         }
@@ -24,7 +22,7 @@ def homepage(request):
 def approve_reservation(request, reservation_id):
     try:
         r = Reservation.objects.get(pk=reservation_id)
-        if request.user.is_authenticated() and (r.propertie.owner.user == request.user or request.user.is_superuser):
+        if request.user.is_authenticated() and (r.propertie.owner == request.user or request.user.is_superuser):
             if r.approved:
                 warning = "It had been approved, though."
             else:
@@ -52,12 +50,11 @@ def propertie(request, propertie_id):
         if p.hidden and not request.user.is_superuser:
             raise ObjectDoesNotExist
         else:
-            
             context = {
                 'p': p,
-                'show_reservation_form': p.owner.user != request.user,
-                'show_admin_links': request.user.is_superuser or p.owner.user == request.user,
-                'requested_by': request.user.id,
+                'show_reservation_form': p.owner != request.user,
+                'show_admin_links': request.user.is_superuser or p.owner == request.user,
+                'show_submit_review_form': p.owner != request.user,
                 'reviews': Review.objects.filter(propertie__owner__id=p.owner.id).filter(hidden=False)
             }
     except ObjectDoesNotExist:
@@ -69,19 +66,66 @@ def propertie(request, propertie_id):
         return render(request, 'bnb/property.html', context)
 
 def request_reservation(request, propertie_id):
-    #request.POST.get('start_date')
-    #request.POST.get('end_date')
-    return HttpResponseNotFound('to be coded.')
+    try:
+        if not request.user.is_authenticated():
+            #return HttpResponse('okokokok')
+            raise PermissionDenied
+        p = Propertie.objects.get(pk=propertie_id)
+        r = Reservation()
+        r.propertie = p
+        r.renter = request.user
+        r.start_date = request.POST.get('start_date')
+        r.end_date = request.POST.get('end_date')
+        r.save()
+
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound(_('Property not found'))
+    except PermissionDenied:
+        return HttpResponseForbidden(_('Permission Denied.'))
+    except:
+        return HttpResponse(_('Unexpected Error:'))
+    else:
+        return HttpResponse('Reservation Requested.')
 
 def edit_property(request, propertie_id):
-    return HttpResponseNotFound('to be coded.')
+    return HttpResponseNotFound('to be coded by Zhengyu, who\'s wondering if there\'s an easier way.')
 
 def hide_property(request, propertie_id):
-    return HttpResponseNotFound('to be coded.')
+    # Simplied - Not validating data or handling exceptions.
+    try:
+        p = Propertie.objects.get(pk=propertie_id)
+        p.hidden = True
+        p.save()
+    except:
+        return HttpResponse(_('Unexpected Error:'))
+    else:
+        return HttpResponse('Property is now hidden. {}'.format(p))
 
 def unhide_property(request, propertie_id):
-    return HttpResponseNotFound('to be coded.')
+    # Simplied - Not validating data or handling exceptions.
+    try:
+        p = Propertie.objects.get(pk=propertie_id)
+        p.hidden = False
+        p.save()
+    except:
+        return HttpResponse(_('Unexpected Error:'))
+    else:
+        return HttpResponse('Property is now not hidden. {}'.format(p))
 
-def bnbuser_details(request, bnbuser_id):
-    return HttpResponseNotFound('to be coded.')
+def review_property(request, propertie_id):
+    # Simplied - Not validating data or handling exceptions.
+    try:
+        r = Review()
+        r.reviewer = request.user
+        r.propertie = Propertie.objects.get(pk=propertie_id)
+        r.rating = request.POST.get('rating')
+        r.comment = request.POST.get('comment')
+        r.save()
+    except:
+        return HttpResponse(_('Unexpected Error:'))
+    else:
+        return HttpResponse('Review Added.')
+
+def user_details(request, bnbuser_id):
+    return HttpResponseNotFound('to be coded by Dan.')
 
